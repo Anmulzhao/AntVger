@@ -6,6 +6,7 @@ import { isDeliverableMessageChannel } from "../../../src/utils/message-channel.
 import { createFlowRecord, getFlowById, updateFlowRecordById } from "./flow-registry.js";
 import type { FlowOutputBag, FlowOutputValue, FlowRecord } from "./flow-registry.types.js";
 import { createQueuedTaskRun, createRunningTaskRun } from "./task-executor.js";
+import { assertCallerAccessOwnedSession } from "./task-owner-access.js";
 import { listTasksForFlowId } from "./task-registry.js";
 import type {
   TaskDeliveryStatus,
@@ -39,6 +40,17 @@ function requireLinearFlow(flowId: string): FlowRecord {
   if (flow.shape !== "linear") {
     throw new Error(`Flow is not linear: ${flowId}`);
   }
+  return flow;
+}
+
+function requireOwnedLinearFlow(flowId: string, callerSessionKey: string): FlowRecord {
+  const flow = requireLinearFlow(flowId);
+  assertCallerAccessOwnedSession({
+    callerSessionKey,
+    ownerSessionKey: flow.ownerSessionKey,
+    subject: "flow",
+    subjectId: flowId,
+  });
   return flow;
 }
 
@@ -106,6 +118,7 @@ export function createFlow(params: {
 }
 
 export function runTaskInFlow(params: {
+  callerSessionKey: string;
   flowId: string;
   runtime: TaskRuntime;
   sourceId?: string;
@@ -124,7 +137,7 @@ export function runTaskInFlow(params: {
   progressSummary?: string | null;
   currentStep?: string;
 }): { flow: FlowRecord; task: TaskRecord } {
-  const flow = requireLinearFlow(params.flowId);
+  const flow = requireOwnedLinearFlow(params.flowId, params.callerSessionKey);
   const launch = params.launch ?? "queued";
   const task =
     launch === "running"
@@ -178,12 +191,13 @@ export function runTaskInFlow(params: {
 }
 
 export function setFlowWaiting(params: {
+  callerSessionKey: string;
   flowId: string;
   currentStep?: string | null;
   waitingOnTaskId?: string | null;
   updatedAt?: number;
 }): FlowRecord {
-  const flow = requireLinearFlow(params.flowId);
+  const flow = requireOwnedLinearFlow(params.flowId, params.callerSessionKey);
   if (params.waitingOnTaskId?.trim()) {
     const waitingOnTaskId = params.waitingOnTaskId.trim();
     const linkedTaskIds = new Set(listTasksForFlowId(flow.flowId).map((task) => task.taskId));
@@ -201,12 +215,13 @@ export function setFlowWaiting(params: {
 }
 
 export function setFlowOutput(params: {
+  callerSessionKey: string;
   flowId: string;
   key: string;
   value: FlowOutputValue;
   updatedAt?: number;
 }): FlowRecord {
-  const flow = requireLinearFlow(params.flowId);
+  const flow = requireOwnedLinearFlow(params.flowId, params.callerSessionKey);
   const key = params.key.trim();
   if (!key) {
     throw new Error("Flow output key is required.");
@@ -220,12 +235,13 @@ export function setFlowOutput(params: {
 }
 
 export function appendFlowOutput(params: {
+  callerSessionKey: string;
   flowId: string;
   key: string;
   value: FlowOutputValue;
   updatedAt?: number;
 }): FlowRecord {
-  const flow = requireLinearFlow(params.flowId);
+  const flow = requireOwnedLinearFlow(params.flowId, params.callerSessionKey);
   const key = params.key.trim();
   if (!key) {
     throw new Error("Flow output key is required.");
@@ -247,11 +263,12 @@ export function appendFlowOutput(params: {
 }
 
 export function resumeFlow(params: {
+  callerSessionKey: string;
   flowId: string;
   currentStep?: string | null;
   updatedAt?: number;
 }): FlowRecord {
-  const flow = requireLinearFlow(params.flowId);
+  const flow = requireOwnedLinearFlow(params.flowId, params.callerSessionKey);
   return updateRequiredFlow(flow.flowId, {
     status: "running",
     currentStep: params.currentStep,
@@ -264,12 +281,13 @@ export function resumeFlow(params: {
 }
 
 export function finishFlow(params: {
+  callerSessionKey: string;
   flowId: string;
   currentStep?: string | null;
   updatedAt?: number;
   endedAt?: number;
 }): FlowRecord {
-  const flow = requireLinearFlow(params.flowId);
+  const flow = requireOwnedLinearFlow(params.flowId, params.callerSessionKey);
   const endedAt = params.endedAt ?? params.updatedAt ?? Date.now();
   return updateRequiredFlow(flow.flowId, {
     status: "succeeded",
@@ -283,12 +301,13 @@ export function finishFlow(params: {
 }
 
 export function failFlow(params: {
+  callerSessionKey: string;
   flowId: string;
   currentStep?: string | null;
   updatedAt?: number;
   endedAt?: number;
 }): FlowRecord {
-  const flow = requireLinearFlow(params.flowId);
+  const flow = requireOwnedLinearFlow(params.flowId, params.callerSessionKey);
   const endedAt = params.endedAt ?? params.updatedAt ?? Date.now();
   return updateRequiredFlow(flow.flowId, {
     status: "failed",
@@ -302,13 +321,14 @@ export function failFlow(params: {
 }
 
 export async function emitFlowUpdate(params: {
+  callerSessionKey: string;
   flowId: string;
   content: string;
   eventKey?: string;
   currentStep?: string | null;
   updatedAt?: number;
 }): Promise<{ flow: FlowRecord; delivery: FlowUpdateDelivery }> {
-  const flow = requireFlow(params.flowId);
+  const flow = requireOwnedLinearFlow(params.flowId, params.callerSessionKey);
   const content = params.content.trim();
   if (!content) {
     throw new Error("Flow update content is required.");

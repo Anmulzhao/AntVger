@@ -1,4 +1,4 @@
-import { createRunningTaskRun } from "openclaw/plugin-sdk/tasks";
+import { createRunningTaskRun } from "../tasks/runtime-internal.js";
 import { loadConfig } from "../config/config.js";
 import { callGateway } from "../gateway/call.js";
 import { createSubsystemLogger } from "../logging/subsystem.js";

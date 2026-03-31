@@ -28,11 +28,11 @@ It does **not** own branching or business logic. Put that in Lobster, acpx, or t
 ## Runtime pattern
 
 1. `createFlow(...)`
-2. `runTaskInFlow(...)`
-3. `setFlowWaiting(...)` or `setFlowOutput(...)`
-4. `resumeFlow(...)`
-5. `emitFlowUpdate(...)` only when needed
-6. `finishFlow(...)` or `failFlow(...)`
+2. `runTaskInFlow({ callerSessionKey, ... })`
+3. `setFlowWaiting({ callerSessionKey, ... })` or `setFlowOutput({ callerSessionKey, ... })`
+4. `resumeFlow({ callerSessionKey, ... })`
+5. `emitFlowUpdate({ callerSessionKey, ... })` only when needed
+6. `finishFlow({ callerSessionKey, ... })` or `failFlow({ callerSessionKey, ... })`
 
 ## Example shape
 
@@ -43,6 +43,7 @@ const flow = createFlow({
 });
 
 const classify = runTaskInFlow({
+  callerSessionKey: ownerSessionKey,
   flowId: flow.flowId,
   runtime: "acp",
   task: "Classify inbox messages",
@@ -50,11 +51,13 @@ const classify = runTaskInFlow({
 });
 
 resumeFlow({
+  callerSessionKey: ownerSessionKey,
   flowId: flow.flowId,
   currentStep: "route_results",
 });
 
 setFlowOutput({
+  callerSessionKey: ownerSessionKey,
   flowId: flow.flowId,
   key: "classification",
   value: { route: "business" },

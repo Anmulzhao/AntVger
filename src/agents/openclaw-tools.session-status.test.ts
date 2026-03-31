@@ -193,7 +193,8 @@ async function loadFreshOpenClawToolsForSessionStatusTest() {
     buildStatusMessage: buildStatusMessageMock,
   }));
   vi.doMock("openclaw/plugin-sdk/tasks", () => ({
-    listTasksForSessionKey: (sessionKey: string) => listTasksForSessionKeyMock(sessionKey),
+    listTasksForSessionKeyForCaller: (params: { sessionKey: string }) =>
+      listTasksForSessionKeyMock(params.sessionKey),
   }));
   ({ createSessionStatusTool } = await import("./tools/session-status-tool.js"));
 }

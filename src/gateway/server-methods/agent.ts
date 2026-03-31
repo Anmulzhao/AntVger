@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { createRunningTaskRun } from "openclaw/plugin-sdk/tasks";
+import { createRunningTaskRun } from "../../tasks/runtime-internal.js";
 import { listAgentIds } from "../../agents/agent-scope.js";
 import type { AgentInternalEvent } from "../../agents/internal-events.js";
 import {

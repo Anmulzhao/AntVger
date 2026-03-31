@@ -1,5 +1,5 @@
 import { Type } from "@sinclair/typebox";
-import { listTasksForSessionKey } from "openclaw/plugin-sdk/tasks";
+import { listTasksForSessionKeyForCaller } from "openclaw/plugin-sdk/tasks";
 import { normalizeGroupActivation } from "../../auto-reply/group-activation.js";
 import { getFollowupQueueDepth, resolveQueueSettings } from "../../auto-reply/reply/queue.js";
 import { buildStatusMessage } from "../../auto-reply/status.js";
@@ -119,8 +119,14 @@ function resolveStoreScopedRequesterKey(params: {
   return parsed.rest === params.mainKey ? params.mainKey : params.requesterKey;
 }
 
-function formatSessionTaskLine(sessionKey: string): string | undefined {
-  const tasks = listTasksForSessionKey(sessionKey);
+function formatSessionTaskLine(params: {
+  callerSessionKey: string;
+  sessionKey: string;
+}): string | undefined {
+  const tasks = listTasksForSessionKeyForCaller({
+    callerSessionKey: params.callerSessionKey,
+    sessionKey: params.sessionKey,
+  });
   if (tasks.length === 0) {
     return undefined;
   }
@@ -568,7 +574,10 @@ export function createSessionStatusTool(opts?: {
         },
         includeTranscriptUsage: true,
       });
-      const taskLine = formatSessionTaskLine(resolved.key);
+      const taskLine = formatSessionTaskLine({
+        callerSessionKey: visibilityRequesterKey,
+        sessionKey: resolved.key,
+      });
       const fullStatusText = taskLine ? `${statusText}\n${taskLine}` : statusText;
 
       return {

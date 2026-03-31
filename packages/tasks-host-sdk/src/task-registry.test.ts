@@ -12,10 +12,13 @@ import { createFlowRecord, getFlowById, resetFlowRegistryForTests } from "./flow
 import {
   createTaskRecord,
   findLatestTaskForSessionKey,
+  findLatestTaskForSessionKeyForCaller,
   findTaskByRunId,
+  findTaskByRunIdForCaller,
   getTaskById,
   getTaskRegistrySummary,
   listTasksForSessionKey,
+  listTasksForSessionKeyForCaller,
   listTaskRecords,
   maybeDeliverTaskStateChangeUpdate,
   maybeDeliverTaskTerminalUpdate,
@@ -168,6 +171,97 @@ describe("task-registry", () => {
         status: "succeeded",
         endedAt: 250,
       });
+    });
+  });
+
+  it("scopes session-key task reads to the owning agent", async () => {
+    await withTaskRegistryTempDir(async () => {
+      createTaskRecord({
+        runtime: "acp",
+        requesterSessionKey: "agent:main:main",
+        childSessionKey: "agent:main:subagent:child",
+        runId: "run-owned-main",
+        task: "Main agent task",
+      });
+
+      createTaskRecord({
+        runtime: "acp",
+        requesterSessionKey: "agent:other:main",
+        childSessionKey: "agent:other:subagent:child",
+        runId: "run-owned-other",
+        task: "Other agent task",
+      });
+
+      expect(
+        listTasksForSessionKeyForCaller({
+          callerSessionKey: "agent:main:main",
+          sessionKey: "agent:main:main",
+        }),
+      ).toHaveLength(1);
+      expect(
+        listTasksForSessionKeyForCaller({
+          callerSessionKey: "agent:main:main",
+          sessionKey: "agent:other:main",
+        }),
+      ).toEqual([]);
+      expect(
+        findLatestTaskForSessionKeyForCaller({
+          callerSessionKey: "agent:main:main",
+          sessionKey: "agent:other:main",
+        }),
+      ).toBeUndefined();
+    });
+  });
+
+  it("scopes run-id task reads to the owning agent", async () => {
+    await withTaskRegistryTempDir(async () => {
+      const task = createTaskRecord({
+        runtime: "subagent",
+        requesterSessionKey: "agent:main:main",
+        childSessionKey: "agent:main:subagent:child",
+        runId: "run-owned-by-main",
+        task: "Inspect inbox",
+      });
+
+      expect(
+        findTaskByRunIdForCaller({
+          callerSessionKey: "agent:main:main",
+          runId: "run-owned-by-main",
+        }),
+      ).toMatchObject({
+        taskId: task.taskId,
+      });
+      expect(
+        findTaskByRunIdForCaller({
+          callerSessionKey: "agent:other:main",
+          runId: "run-owned-by-main",
+        }),
+      ).toBeUndefined();
+    });
+  });
+
+  it("hides ownerless task records from caller-scoped reads", async () => {
+    await withTaskRegistryTempDir(async () => {
+      createTaskRecord({
+        runtime: "acp",
+        requesterSessionKey: "",
+        childSessionKey: "agent:main:subagent:child",
+        runId: "run-ownerless",
+        task: "Legacy ownerless task",
+      });
+
+      expect(
+        listTasksForSessionKeyForCaller({
+          callerSessionKey: "agent:main:main",
+          sessionKey: "",
+        }),
+      ).toEqual([]);
+      expect(
+        findTaskByRunIdForCaller({
+          callerSessionKey: "agent:main:main",
+          runId: "run-ownerless",
+        }),
+      ).toBeUndefined();
     });
   });
 

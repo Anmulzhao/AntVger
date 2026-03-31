@@ -1,4 +1,4 @@
-import { findTaskByRunId } from "openclaw/plugin-sdk/tasks";
+import { findTaskByRunIdForCaller } from "openclaw/plugin-sdk/tasks";
 import { countPendingDescendantRuns } from "../../../agents/subagent-registry.js";
 import { loadSessionStore, resolveStorePath } from "../../../config/sessions.js";
 import { formatDurationCompact } from "../../../shared/subagents-format.js";
@@ -37,7 +37,10 @@ export function handleSubagentsInfoAction(ctx: SubagentsCommandContext): Command
   const outcome = run.outcome
     ? `${run.outcome.status}${run.outcome.error ? ` (${run.outcome.error})` : ""}`
     : "n/a";
-  const linkedTask = findTaskByRunId(run.runId);
+  const linkedTask = findTaskByRunIdForCaller({
+    callerSessionKey: requesterKey,
+    runId: run.runId,
+  });
 
   const lines = [
     "ℹ️ Subagent info",

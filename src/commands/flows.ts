@@ -1,7 +1,11 @@
-import { getFlowById, listFlowRecords, resolveFlowForLookupToken } from "openclaw/plugin-sdk/tasks";
-import type { FlowRecord, FlowStatus } from "openclaw/plugin-sdk/tasks";
-import { cancelFlowById, getFlowTaskSummary } from "openclaw/plugin-sdk/tasks";
-import { listTasksForFlowId } from "openclaw/plugin-sdk/tasks";
+import {
+  getFlowById,
+  listFlowRecords,
+  resolveFlowForLookupToken,
+} from "../tasks/runtime-internal.js";
+import type { FlowRecord, FlowStatus } from "../tasks/runtime-internal.js";
+import { cancelFlowById, getFlowTaskSummary } from "../tasks/runtime-internal.js";
+import { listTasksForFlowId } from "../tasks/runtime-internal.js";
 import { loadConfig } from "../config/config.js";
 import { info } from "../globals.js";
 import type { RuntimeEnv } from "../runtime.js";

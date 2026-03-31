@@ -1,6 +1,6 @@
 import { appendFile, mkdir } from "node:fs/promises";
 import path from "node:path";
-import { recordTaskRunProgressByRunId } from "openclaw/plugin-sdk/tasks";
+import { recordTaskRunProgressByRunId } from "../tasks/runtime-internal.js";
 import { readAcpSessionEntry } from "../acp/runtime/session-meta.js";
 import { resolveSessionFilePath, resolveSessionFilePathOptions } from "../config/sessions/paths.js";
 import { onAgentEvent } from "../infra/agent-events.js";

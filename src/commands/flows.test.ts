@@ -12,7 +12,7 @@ const mocks = vi.hoisted(() => ({
   loadConfigMock: vi.fn(() => ({ loaded: true })),
 }));
 
-vi.mock("openclaw/plugin-sdk/tasks", () => ({
+vi.mock("../tasks/runtime-internal.js", () => ({
   listFlowRecords: (...args: unknown[]) => mocks.listFlowRecordsMock(...args),
   resolveFlowForLookupToken: (...args: unknown[]) => mocks.resolveFlowForLookupTokenMock(...args),
   getFlowById: (...args: unknown[]) => mocks.getFlowByIdMock(...args),

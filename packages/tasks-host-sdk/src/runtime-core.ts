@@ -4,6 +4,7 @@ export * from "./flow-registry.types.js";
 export * from "./flow-runtime.js";
 export * from "./operations-runtime.js";
 export * from "./task-executor.js";
+export * from "./task-owner-access.js";
 export * from "./task-registry.audit.shared.js";
 export * from "./task-registry.audit.js";
 export * from "./task-registry.maintenance.js";

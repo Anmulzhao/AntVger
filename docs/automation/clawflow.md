@@ -69,14 +69,14 @@ It does **not** own branching or business logic. Put that in the authoring layer
 In practice, authoring layers target a small runtime surface:
 
 - `createFlow(...)`
-- `runTaskInFlow(...)`
-- `setFlowWaiting(...)`
-- `setFlowOutput(...)`
-- `appendFlowOutput(...)`
-- `emitFlowUpdate(...)`
-- `resumeFlow(...)`
-- `finishFlow(...)`
-- `failFlow(...)`
+- `runTaskInFlow({ callerSessionKey, ... })`
+- `setFlowWaiting({ callerSessionKey, ... })`
+- `setFlowOutput({ callerSessionKey, ... })`
+- `appendFlowOutput({ callerSessionKey, ... })`
+- `emitFlowUpdate({ callerSessionKey, ... })`
+- `resumeFlow({ callerSessionKey, ... })`
+- `finishFlow({ callerSessionKey, ... })`
+- `failFlow({ callerSessionKey, ... })`
 
 That keeps flow ownership and return-to-thread behavior in core without forcing a single DSL on top of it.
 
@@ -87,7 +87,7 @@ If you are authoring a linear flow in plain TypeScript, prefer the helper layer 
 The helper surface is intentionally small:
 
 - `createFlowAuthoringHelper(...)`
-- `bindFlowAuthoringHelper(flowId)`
+- `bindFlowAuthoringHelper(flowId, callerSessionKey)`
 
 Each helper is already scoped to one flow and exposes the usual runtime verbs:
 

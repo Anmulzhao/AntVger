@@ -1,4 +1,4 @@
-import { resetTaskRegistryForTests } from "openclaw/plugin-sdk/tasks";
+import { resetTaskRegistryForTests } from "../tasks/runtime-internal.js";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import * as acpSessionManager from "../acp/control-plane/manager.js";
 import type { AcpInitializeSessionInput } from "../acp/control-plane/manager.types.js";

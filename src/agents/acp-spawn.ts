@@ -1,5 +1,5 @@
 import crypto from "node:crypto";
-import { createRunningTaskRun } from "openclaw/plugin-sdk/tasks";
+import { createRunningTaskRun } from "../tasks/runtime-internal.js";
 import { getAcpSessionManager } from "../acp/control-plane/manager.js";
 import {
   cleanupFailedAcpSpawn,

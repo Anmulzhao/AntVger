@@ -26,6 +26,7 @@ import {
   type TaskRegistryHookEvent,
 } from "./task-registry.store.js";
 import { summarizeTaskRecords } from "./task-registry.summary.js";
+import { canCallerAccessOwnedSession } from "./task-owner-access.js";
 import type {
   TaskDeliveryState,
   TaskDeliveryStatus,
@@ -1419,6 +1420,45 @@ export function listTasksForSessionKey(sessionKey: string): TaskRecord[] {
     )
     .toSorted(compareTasksNewestFirst)
     .map(({ insertionIndex: _, ...task }) => task);
+}
+
+export function listTasksForSessionKeyForCaller(params: {
+  callerSessionKey: string;
+  sessionKey: string;
+}): TaskRecord[] {
+  if (
+    !canCallerAccessOwnedSession({
+      callerSessionKey: params.callerSessionKey,
+      ownerSessionKey: params.sessionKey,
+    })
+  ) {
+    return [];
+  }
+  return listTasksForSessionKey(params.sessionKey);
+}
+
+export function findLatestTaskForSessionKeyForCaller(params: {
+  callerSessionKey: string;
+  sessionKey: string;
+}): TaskRecord | undefined {
+  const task = listTasksForSessionKeyForCaller(params)[0];
+  return task ? cloneTaskRecord(task) : undefined;
+}
+
+export function findTaskByRunIdForCaller(params: {
+  callerSessionKey: string;
+  runId: string;
+}): TaskRecord | undefined {
+  const task = findTaskByRunId(params.runId);
+  if (!task) {
+    return undefined;
+  }
+  return canCallerAccessOwnedSession({
+    callerSessionKey: params.callerSessionKey,
+    ownerSessionKey: task.requesterSessionKey,
+  })
+    ? task
+    : undefined;
 }
 
 export function resolveTaskForLookupToken(token: string): TaskRecord | undefined {

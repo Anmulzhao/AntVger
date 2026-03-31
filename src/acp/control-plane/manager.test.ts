@@ -37,9 +37,9 @@ vi.mock("../runtime/registry.js", async (importOriginal) => {
 let AcpSessionManager: typeof import("./manager.js").AcpSessionManager;
 let AcpRuntimeError: typeof import("../runtime/errors.js").AcpRuntimeError;
 let resetAcpSessionManagerForTests: typeof import("./manager.js").__testing.resetAcpSessionManagerForTests;
-let findTaskByRunId: typeof import("openclaw/plugin-sdk/tasks").findTaskByRunId;
-let resetTaskRegistryForTests: typeof import("openclaw/plugin-sdk/tasks").resetTaskRegistryForTests;
-let resetFlowRegistryForTests: typeof import("openclaw/plugin-sdk/tasks").resetFlowRegistryForTests;
+let findTaskByRunId: typeof import("../../tasks/runtime-internal.js").findTaskByRunId;
+let resetTaskRegistryForTests: typeof import("../../tasks/runtime-internal.js").resetTaskRegistryForTests;
+let resetFlowRegistryForTests: typeof import("../../tasks/runtime-internal.js").resetFlowRegistryForTests;
 let installInMemoryTaskAndFlowRegistryRuntime: typeof import("../../test-utils/task-flow-registry-runtime.js").installInMemoryTaskAndFlowRegistryRuntime;
 
 const baseCfg = {
@@ -184,8 +184,9 @@ describe("AcpSessionManager", () => {
       __testing: { resetAcpSessionManagerForTests },
     } = await import("./manager.js"));
     ({ AcpRuntimeError } = await import("../runtime/errors.js"));
-    ({ findTaskByRunId, resetTaskRegistryForTests } = await import("openclaw/plugin-sdk/tasks"));
-    ({ resetFlowRegistryForTests } = await import("openclaw/plugin-sdk/tasks"));
+    ({ findTaskByRunId, resetTaskRegistryForTests } =
+      await import("../../tasks/runtime-internal.js"));
+    ({ resetFlowRegistryForTests } = await import("../../tasks/runtime-internal.js"));
     ({ installInMemoryTaskAndFlowRegistryRuntime } =
       await import("../../test-utils/task-flow-registry-runtime.js"));
   });

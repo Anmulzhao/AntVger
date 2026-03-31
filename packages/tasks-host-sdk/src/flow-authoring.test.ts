@@ -119,7 +119,7 @@ describe("flow-authoring", () => {
         },
         goal: "Review inbox",
       });
-      const helper = bindFlowAuthoringHelper(flow.flowId);
+      const helper = bindFlowAuthoringHelper(flow.flowId, "agent:main:main");
 
       const started = helper.runTask({
         runtime: "subagent",
@@ -189,8 +189,21 @@ describe("flow-authoring", () => {
         deliveryStatus: "pending",
       });
 
-      expect(() => bindFlowAuthoringHelper(task.parentFlowId!)).toThrow(
+      expect(() => bindFlowAuthoringHelper(task.parentFlowId!, "agent:main:main")).toThrow(
         `Flow is not linear: ${task.parentFlowId}`,
+      );
+    });
+  });
+
+  it("refuses to bind the authoring helper for another agent", async () => {
+    await withFlowAuthoringStateDir(async () => {
+      const { flow } = createFlowAuthoringHelper({
+        ownerSessionKey: "agent:main:main",
+        goal: "Review inbox",
+      });
+
+      expect(() => bindFlowAuthoringHelper(flow.flowId, "agent:other:main")).toThrow(
+        `Access denied for flow ${flow.flowId}.`,
       );
     });
   });

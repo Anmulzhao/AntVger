@@ -1,7 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import * as taskExecutor from "openclaw/plugin-sdk/tasks";
-import { findTaskByRunId, resetTaskRegistryForTests } from "openclaw/plugin-sdk/tasks";
+import * as taskExecutor from "../../tasks/runtime-internal.js";
+import { findTaskByRunId, resetTaskRegistryForTests } from "../../tasks/runtime-internal.js";
 import { describe, expect, it, vi } from "vitest";
 import { setupCronServiceSuite, writeCronStoreSnapshot } from "../service.test-harness.js";
 import type { CronJob } from "../types.js";

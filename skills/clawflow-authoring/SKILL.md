@@ -13,7 +13,7 @@ Use this skill when work should span one or more detached tasks but still behave
 Prefer the authoring helper layer above the runtime substrate:
 
 - `createFlowAuthoringHelper(...)`
-- `bindFlowAuthoringHelper(flowId)`
+- `bindFlowAuthoringHelper(flowId, callerSessionKey)`
 
 That helper exposes the runtime verbs already scoped to one flow:
 

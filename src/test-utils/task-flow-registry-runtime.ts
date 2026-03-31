@@ -2,14 +2,14 @@ import {
   configureFlowRegistryRuntime,
   type FlowRegistryStore,
   type FlowRegistryStoreSnapshot,
-} from "openclaw/plugin-sdk/tasks";
-import type { FlowRecord } from "openclaw/plugin-sdk/tasks";
+} from "../tasks/runtime-internal.js";
+import type { FlowRecord } from "../tasks/runtime-internal.js";
 import {
   configureTaskRegistryRuntime,
   type TaskRegistryStore,
   type TaskRegistryStoreSnapshot,
-} from "openclaw/plugin-sdk/tasks";
-import type { TaskDeliveryState, TaskRecord } from "openclaw/plugin-sdk/tasks";
+} from "../tasks/runtime-internal.js";
+import type { TaskDeliveryState, TaskRecord } from "../tasks/runtime-internal.js";
 
 function cloneTask(task: TaskRecord): TaskRecord {
   return { ...task };

@@ -1,4 +1,4 @@
-import { findLatestTaskForSessionKey } from "openclaw/plugin-sdk/tasks";
+import { findLatestTaskForSessionKeyForCaller } from "openclaw/plugin-sdk/tasks";
 import { getAcpSessionManager } from "../../../acp/control-plane/manager.js";
 import {
   parseRuntimeTimeoutSecondsInput,
@@ -123,7 +123,10 @@ export async function handleAcpStatusAction(
     fallbackCode: "ACP_TURN_FAILED",
     fallbackMessage: "Could not read ACP session status.",
     onSuccess: (status) => {
-      const linkedTask = findLatestTaskForSessionKey(status.sessionKey);
+      const linkedTask = findLatestTaskForSessionKeyForCaller({
+        callerSessionKey: params.sessionKey ?? "",
+        sessionKey: status.sessionKey,
+      });
       const sessionIdentifierLines = resolveAcpSessionIdentifierLinesFromIdentity({
         backend: status.backend,
         identity: status.identity,

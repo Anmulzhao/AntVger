@@ -3,7 +3,7 @@ import {
   completeTaskRunByRunId,
   failTaskRunByRunId,
   startTaskRunByRunId,
-} from "openclaw/plugin-sdk/tasks";
+} from "../../tasks/runtime-internal.js";
 import { resolveAgentTimeoutMs } from "../../agents/timeout.js";
 import type { OpenClawConfig } from "../../config/config.js";
 import { logVerbose } from "../../globals.js";
