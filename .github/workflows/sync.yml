@@ -19,8 +19,8 @@ jobs:
       - name: Sync with upstream
         run: |
           git remote add upstream https://github.com/openclaw/openclaw.git || true
-          git fetch --unshallow upstream
+          git fetch upstream
           git config user.name "AntVger Bot"
           git config user.email "bot@antvger.github.com"
-          git merge upstream/main --no-edit || echo "No changes"
-          git push origin main --force
+          git merge upstream/main
+          git push origin main
